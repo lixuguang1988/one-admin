@@ -44,7 +44,7 @@ const useUserStore = defineStore('userInfo', {
         menus: [],
         buttons: [],
       },
-      menus: [],
+      menus: {},
       permissionFetched: false,
     }
   },
@@ -62,7 +62,7 @@ const useUserStore = defineStore('userInfo', {
       }
     },
     async checkPermission(to: RouteLocationNormalized) {
-      if (!this.permissionFetched) {
+      if (!Object.keys(this.menus).length) {
         await this.queryPermission()
       }
       if (to.name && this.menus[to.name]) {

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import userDepartmentRoute from './userDepartment'
+import systemRoute from './system'
 import homeRoute from './home'
 import aboutRoute from './about'
 import otherRoute from './other'
@@ -7,7 +7,7 @@ import { getToken } from '@/utils/auth'
 import useUserStore from '@/stores/useUserStore'
 
 // 路由配置
-export const routes = [homeRoute, userDepartmentRoute, aboutRoute, ...otherRoute]
+export const routes = [homeRoute, systemRoute, aboutRoute, ...otherRoute]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

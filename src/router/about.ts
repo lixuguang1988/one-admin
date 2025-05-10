@@ -11,7 +11,7 @@ export default {
       name: 'about-index',
       meta: {
         title: '关于我们',
-        icon: 'SettingOutlined',
+        icon: 'UserOutlined',
       },
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
