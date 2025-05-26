@@ -123,7 +123,7 @@ const queryPermission = async () => {
     return
   }
   try {
-    const res = await queryTreeApi({})
+    const res = await queryTreeApi()
     console.log('*********************', res)
 
     tree.data = [

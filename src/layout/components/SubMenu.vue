@@ -7,7 +7,8 @@
       </span>
     </template>
     <template v-for="item in subItem.children" :key="item.key">
-      <a-menu-item v-if="!item.children" :key="item.key" :icon="item.icon">
+      <a-menu-item v-if="!item.children" :key="item.key">
+        <component v-if="item.icon && Icons[item.icon]" :is="Icons[item.icon]" />
         <span>{{ item.label }}</span>
       </a-menu-item>
       <!-- 递归调用自身组件 -->

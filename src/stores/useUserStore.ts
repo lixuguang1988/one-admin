@@ -48,23 +48,29 @@ const useUserStore = defineStore('userInfo', {
       permissionFetched: false,
     }
   },
+  getters: {
+    getMenus: (state) => state.menus,
+    username: (state) => state.userInfo.username,
+    avatar: (state) => state.userInfo.avatar,
+  },
   actions: {
     /**
      * Queries and updates the user's permissions, including menus and buttons.
      */
     async queryPermission() {
       try {
+        if (this.permissionFetched) {
+          return
+        }
         const res = await queryPermissionApi({})
         console.log(res, '-----------')
         this.menus = res.data
+        this.permissionFetched = true
       } catch (error) {
-        this.menus = []
+        this.menus = {}
       }
     },
     async checkPermission(to: RouteLocationNormalized) {
-      if (!Object.keys(this.menus).length) {
-        await this.queryPermission()
-      }
       if (to.name && this.menus[to.name]) {
         return true
       } else {
@@ -76,6 +82,20 @@ const useUserStore = defineStore('userInfo', {
         ...this.userInfo,
         ...userInfo,
       }
+    },
+    logout() {
+      this.userInfo = {
+        id: '',
+        name: '',
+        username: '',
+        email: '',
+        phone: '',
+        avatar: '',
+        department: '',
+        role: '',
+      }
+      this.menus = {}
+      this.permissionFetched = false
     },
   },
   // 持久化存储插件其他配置

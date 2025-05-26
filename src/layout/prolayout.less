@@ -8,10 +8,13 @@
     left: var(--sider-width);
     right: 0;
     z-index: 99;
+    height: var(--header-height);
+    background: rgb(255, 255, 255);
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
     .pro-layout-trigger {
       font-size: 18px;
-      line-height: 64px;
-      padding: 0 24px;
       cursor: pointer;
       transition: color 0.3s;
       &:hover {
@@ -28,20 +31,24 @@
     z-index: 99;
     overflow-x: hidden;
     overflow-y: auto;
-    padding-top: 64px;
-    .layout-logo {
-      position: absolute;
+    padding-top: var(--header-height);
+    &::-webkit-scrollbar {
+      display: none; // 不显示滚动条了
+    }
+    .pro-layout-logo {
+      position: fixed;
       top: 0;
       left: 0;
-      right: 0;
+      width: var(--sider-width);
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 64px;
+      height: var(--header-height);
       background: #001529;
       color: #fff;
       font-size: 20px;
       font-weight: bold;
+      z-index: 50;
       span {
         white-space: nowrap;
       }
@@ -54,9 +61,7 @@
   }
 
   .pro-layout-content {
-    padding-top: calc(24px + 64px);
-    padding-bottom: 24px;
-    padding-right: 24px;
-    padding-left: calc(24px + var(--sider-width));
+    padding-top: var(--header-height);
+    padding-left: var(--sider-width);
   }
 }

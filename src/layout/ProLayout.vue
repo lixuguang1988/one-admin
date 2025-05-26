@@ -8,7 +8,7 @@
       collapsible
       class="pro-layout-sider"
     >
-      <div class="layout-logo">
+      <div class="pro-layout-logo">
         <Logo class="logo" />
         <span v-if="!collapsed">{{ title }}</span>
       </div>
@@ -20,7 +20,7 @@
         @click="handleMenuClick"
       >
         <template v-for="item in dataSource" :key="item.key">
-          <a-menu-item v-if="!item.children" :key="item.key" :icon="item.icon">
+          <a-menu-item v-if="!item.children" :key="item.key">
             <component v-if="item.icon && Icons[item.icon]" :is="Icons[item.icon]" />
             <span>{{ item.label }}</span>
           </a-menu-item>
@@ -28,7 +28,7 @@
         </template>
       </a-menu>
     </a-layout-sider>
-    <a-layout-header style="background: #fff; padding: 0" class="pro-layout-header">
+    <a-layout-header class="pro-layout-header">
       <menu-unfold-outlined
         v-if="collapsed"
         class="pro-layout-trigger"
@@ -39,6 +39,7 @@
         class="pro-layout-trigger"
         @click="() => (collapsed = !collapsed)"
       />
+      <header-bar></header-bar>
     </a-layout-header>
     <a-layout-content class="pro-layout-content">
       <router-view />
@@ -56,6 +57,7 @@ import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue'
 import Logo from '@/assets/logo.svg'
 import useUserStore from '@/stores/useUserStore'
 import SubMenu from './components/SubMenu.vue'
+import HeaderBar from './components/HeaderBar.vue'
 import './prolayout.less'
 
 const title = import.meta.env.VITE_APP_TITLE
