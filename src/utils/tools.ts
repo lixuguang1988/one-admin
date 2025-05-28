@@ -28,3 +28,18 @@ export const getBase64 = (img: Blob, callback: Function) => {
   reader.addEventListener('load', () => callback(reader.result))
   reader.readAsDataURL(img)
 }
+
+// 展开制定列
+export const expandedColumn = (id: number) => {
+  const expandElement: HTMLElement = document.querySelector(
+    `.ant-table-content tr[data-row-key="${id}"] .ant-table-row-expand-icon`,
+  ) as HTMLElement
+  if (!expandElement) return
+  console.log(expandElement)
+  if (expandElement.classList.contains('ant-table-row-expand-icon-collapsed')) {
+    expandElement.click()
+    // '已点击展开图标
+  } else {
+    // '展开图标已是展开状态')
+  }
+}

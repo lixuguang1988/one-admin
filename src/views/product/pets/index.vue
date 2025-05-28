@@ -117,20 +117,20 @@
             {{ status[record.status] }}
           </template>
           <template v-else-if="column.key === 'action'">
-            <a-space :size="0">
-              <a-button type="link" @click="handleEdit(record)">修改</a-button>
-              <a-button type="link" danger @click="deleteUser(record.id)">删除</a-button>
+            <a-space>
+              <a-button type="primary" @click="handleEdit(record)">修改</a-button>
+              <a-button type="primary" danger @click="deleteUser(record.id)">删除</a-button>
             </a-space>
           </template>
         </template>
         <!-- <template #expandColumnTitle>
           <span>简介</span>
         </template> -->
-        <!-- <template #expandedRowRender="{ record }">
+        <template #expandedRowRender="{ record }">
           <p style="margin: 0">
             {{ record.description }}
           </p>
-        </template> -->
+        </template>
       </a-table>
     </a-card>
 
