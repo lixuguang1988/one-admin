@@ -29,14 +29,14 @@ export default {
       },
       component: () => import('@/views/product/dict/index.vue'),
     },
-    // {
-    //   path: '/system/department/:departmentId',
-    //   name: 'department-detail',
-    //   meta: {
-    //     activeMenu: '/system/department',
-    //     hideMenu: true,
-    //   },
-    //   component: () => import('@/views/system/department/AboutView.vue'),
-    // },
+    {
+      path: '/product/pet/:id?',
+      name: 'pet-single',
+      meta: {
+        activeMenu: '/product/pets',
+        hideMenu: true,
+      },
+      component: () => import('@/views/product/pets/Single.vue'),
+    },
   ],
 }

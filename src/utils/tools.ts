@@ -1,4 +1,5 @@
-import { message } from 'ant-design-vue'
+import { unref } from 'vue'
+import { message, Upload } from 'ant-design-vue'
 import type { TableColumnsType } from 'ant-design-vue'
 export function resizeColumn(w: number, col: TableColumnsType[number]) {
   col.width = w
@@ -11,16 +12,16 @@ export const rules = {
 
 export const prioritys = Array.from({ length: 11 }, (_, index) => (index + 1) * 10)
 
-export const beforeUpload = (file: any) => {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+export const beforeUpload = (file: any, fileList: any) => {
+  const isJpgOrPng = file.type.startsWith('image/')
   if (!isJpgOrPng) {
-    message.error('You can only upload JPG file!')
+    message.error('请上传图片文件')
   }
   const isLt2M = file.size / 1024 / 1024 < 2
   if (!isLt2M) {
-    message.error('Image must smaller than 2MB!')
+    message.error('大小不能超过2M')
   }
-  return isJpgOrPng && isLt2M
+  return (isJpgOrPng && isLt2M) || Upload.LIST_IGNORE
 }
 
 export const getBase64 = (img: Blob, callback: Function) => {

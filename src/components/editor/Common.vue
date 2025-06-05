@@ -16,23 +16,34 @@ import { ref, watch } from 'vue'
 import Editor from '@tinymce/tinymce-vue'
 
 const props = defineProps({
-  content: 'test',
+  content: {
+    type: String,
+  },
+  type: {
+    type: String,
+    default: 'standard',
+  },
+  height: {
+    type: Number,
+  },
 })
 
-const defaultValue = `
-<h2 style="text-align: center;">
-  TinyMCE provides a <span style="text-decoration: underline;">full-featured</span> rich text editing experience, and a featherweight download.
-</h2>
-<p style="text-align: center;">
-  <strong><span style="font-size: 14pt;"><span style="color: #7e8c8d; font-weight: 600;">No matter what you're building, TinyMCE has got you covered.</span></span></strong>
-</p>`
+const defaultValue = ``
 
 const emits = defineEmits(['update:content'])
 const content = ref(props.content || defaultValue)
 const editorRef = ref(null)
 
+const toolbar =
+  props.type === 'standard'
+    ? 'undo redo | casechange blocks | bold italic backcolor forecolor | image | \
+        alignleft aligncenter alignright alignjustify | \
+        bullist numlst checklist outdent indent | removeformat | a11ycheck code table help'
+    : 'bold italic backcolor forecolor | \
+    alignleft aligncenter alignright alignjustify '
+const defaultHeight = props.type === 'standard' ? 500 : 200
 const editorConfig = {
-  height: 500,
+  height: defaultHeight || props.height,
   menubar: false,
   language: 'zh_CN',
   plugins: [
@@ -60,10 +71,7 @@ const editorConfig = {
     'help',
     'wordcount',
   ],
-  toolbar:
-    'undo redo | casechange blocks | bold italic backcolor forecolor | image | \
-        alignleft aligncenter alignright alignjustify | \
-        bullist numlst checklist outdent indent | removeformat | a11ycheck code table help',
+  toolbar: toolbar,
 }
 watch(
   () => props.content,

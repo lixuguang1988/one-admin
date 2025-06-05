@@ -71,3 +71,10 @@ export const deleteRoleOneApi = (data) => {
     data: data,
   })
 }
+
+export const queryChildDictApi = (parentId) => {
+  return request({
+    url: `/dict/${parentId}/list`,
+    method: 'get',
+  })
+}

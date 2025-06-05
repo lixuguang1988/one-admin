@@ -16,12 +16,16 @@ const router = createRouter({
   routes: routes,
 })
 
-const whiteList = ['/login', '/exception/404', '/exception/403']
+const whiteList = ['/exception/404', '/exception/403']
+const nextList = ['/login']
 
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
   console.log('beforeEach', to, from)
   const isLoggedIn = getToken()
+  if (nextList.includes(to.path)) {
+    return next()
+  }
   if (!isLoggedIn) {
     return next({ path: '/login' })
   }

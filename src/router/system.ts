@@ -21,14 +21,14 @@ export default {
       },
       component: () => import('@/views/system/user/index.vue'),
     },
-    {
-      path: '/system/department',
-      name: 'department',
-      meta: {
-        title: '部门管理',
-      },
-      component: () => import('@/views/system/department/AboutView.vue'),
-    },
+    // {
+    //   path: '/system/department',
+    //   name: 'department',
+    //   meta: {
+    //     title: '部门管理',
+    //   },
+    //   component: () => import('@/views/system/department/AboutView.vue'),
+    // },
     {
       path: '/system/department/:departmentId',
       name: 'department-detail',
