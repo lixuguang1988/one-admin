@@ -49,7 +49,7 @@
       <a-table
         :columns="tableColumns"
         :data-source="dataSource"
-        :pagination="{
+        :pagination2="{
           total: total,
           current: formData.currentPage,
           pageSize: formData.pageSize,
@@ -62,6 +62,7 @@
             queryDataSource()
           },
         }"
+        :pagination="false"
         :loading="loading"
         rowKey="id"
         @resizeColumn="resizeColumn"
@@ -207,6 +208,7 @@ const defaultEditData = {
   menuCode: '',
   menuName: '',
   operation: [],
+  parentId: '',
 }
 const visible = ref(false)
 const editObject = ref({

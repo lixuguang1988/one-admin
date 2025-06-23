@@ -59,9 +59,9 @@
               <a-space>
                 <a-radio-group v-model:value="formState.color">
                   <a-radio v-for="item in colorList" :value="item.id">{{ item.name }}</a-radio>
-                  <a-radio :value="9999">其他</a-radio>
+                  <!-- <a-radio :value="9999">其他</a-radio> -->
                 </a-radio-group>
-                <a-input v-if="formState.color === 9999" v-model:value="formState.colorName" />
+                <!-- <a-input v-if="formState.color === 9999" v-model:value="formState.colorName" /> -->
               </a-space>
             </a-form-item>
           </a-col>

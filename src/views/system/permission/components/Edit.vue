@@ -35,6 +35,26 @@
           <a-input v-model:value="formState.menuCode" />
         </a-form-item>
 
+        <a-form-item label="父级菜单" name="parentId">
+          <a-tree-select
+            v-model:value="formState.parentId"
+            show-search
+            style="width: 100%"
+            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+            placeholder="请选择父级菜单"
+            allow-clear
+            tree-default-expand-all
+            :tree-data="treeData"
+            :fieldNames="{ value: 'id', label: 'menuName', children: 'children' }"
+            tree-node-filter-prop="menuName"
+          >
+            <!-- <template #title="{ value: val, label }">
+              <b v-if="val === 'parent 1-1'" style="color: #08c">sss</b>
+              <template v-else>{{ label }}</template>
+            </template> -->
+          </a-tree-select>
+        </a-form-item>
+
         <a-form-item label="按钮权限" name="operation">
           <a-select v-model:value="formState.operation" mode="multiple">
             <a-select-option v-for="(label, value) in operation" :key="index" :value="value">{{
@@ -50,7 +70,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { addPermissioApi, updatePermissionApi } from '@/api/user/permission'
+import { addPermissioApi, updatePermissionApi, queryTreeApi } from '@/api/user/permission'
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { operation } from '../config'
 // import { status } from '../config'
@@ -76,6 +96,9 @@ watch(
   () => props.visible,
   (newVal) => {
     modelVisible.value = newVal
+    if (newVal) {
+      queryPermission()
+    }
   },
 )
 watch(modelVisible, (newVal) => {
@@ -120,5 +143,19 @@ const handleOk = async () => {
       loading.value = false
     }
   })
+}
+
+const treeData = ref([])
+const queryPermission = async () => {
+  // if (treeData.value.length) {
+  //   return
+  // }
+  try {
+    const res = await queryTreeApi({})
+
+    treeData.value = res.data
+  } catch (error) {
+    console.log(error)
+  }
 }
 </script>

@@ -78,23 +78,21 @@ const defaultColumns = [
   {
     dataIndex: 'id',
     key: 'id',
-    resizable: true,
-    minWidth: 64,
+    width: 96,
     title: 'ID',
   },
   {
     dataIndex: 'name',
     key: 'name',
     resizable: true,
-    minWidth: 150,
+    width: 240,
     title: '字段名称',
   },
   {
     dataIndex: 'code',
     key: 'code',
-    resizable: true,
-    minWidth: 150,
     title: '字段编码',
+    width: 240,
   },
   // {
   //   dataIndex: 'parentName',
@@ -107,6 +105,7 @@ const defaultColumns = [
     dataIndex: 'description',
     key: 'description',
     title: '字段简介',
+    width: 240,
   },
   {
     key: 'action',

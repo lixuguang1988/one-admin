@@ -3,112 +3,136 @@
     <a-card :bordered="false" class="generic-margin-bottom">
       <a-form
         :model="formData"
-        :layout="layout"
-        :labelCol="{ flex: '0 0 120px' }"
+        layout="horizontal"
+        :labelCol="{ flex: '0 0 64px' }"
         autocomplete="off"
         class="page-index-filter"
       >
-        <a-row :gutter="gutter">
-          <a-col :span="span">
-            <a-form-item label="所属栏目" name="columnId">
-              <a-input v-model:value="formData.columnId" placeholder="请输入关键字" allow-clear />
-            </a-form-item>
-          </a-col>
-          <a-col :span="span">
-            <a-form-item label="发布状态" name="username">
-              <a-select
-                v-model:value="formData.status"
-                placeholder="全部"
-                allow-clear
-                @change="queryDataSource"
-              >
-                <a-select-option v-for="(value, key) in status" :value="key">{{
-                  value
-                }}</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="span">
+        <a-row :gutter="24">
+          <a-col :span="6">
             <a-form-item label="关键字" name="keyword">
-              <a-input v-model:value="formData.keyword" placeholder="请输入关键字" allow-clear />
+              <a-input
+                v-model:value="formData.keyword"
+                placeholder="请输入关键字"
+                allow-clear
+                @blur="queryDataSource"
+                @pressEnter="queryDataSource"
+              />
             </a-form-item>
           </a-col>
 
-          <a-col :span="span" :offset="isWide ? 0 : 2 * span">
-            <a-form-item>
-              <a-space class="generic-align-end">
-                <a-button type="default" @click="hanlderReset">重置</a-button>
-                <a-button type="primary" @click="queryDataSource">查询</a-button>
-              </a-space>
+          <a-col :span="24" style="margin-top: 12px">
+            <a-form-item label="品种" name="type">
+              <a-checkable-tag
+                v-model:checked="classAll"
+                @change="(checked) => handleCheckedChange('class', 0, checked)"
+              >
+                全部
+              </a-checkable-tag>
+              <a-checkable-tag
+                v-for="(item, index) in classList"
+                :key="item.id"
+                v-model:checked="item.checked"
+                @change="(checked) => handleCheckedChange('class', item.id, checked)"
+              >
+                {{ item.name }}
+              </a-checkable-tag>
+            </a-form-item>
+          </a-col>
+          <a-col :span="24" style="margin-top: 12px">
+            <a-form-item label="颜色" name="color">
+              <a-checkable-tag
+                v-model:checked="colorAll"
+                @change="(checked) => handleCheckedChange('color', 0, checked)"
+              >
+                全部
+              </a-checkable-tag>
+
+              <a-checkable-tag
+                v-for="(item, index) in colorList"
+                :key="item.id"
+                v-model:checked="item.checked"
+                @change="(checked) => handleCheckedChange('color', item.id, checked)"
+              >
+                {{ item.name }}
+              </a-checkable-tag>
             </a-form-item>
           </a-col>
         </a-row>
       </a-form>
     </a-card>
-    <a-row :gutter="28">
-      <!-- <576px 12  >768px 8 >1200px 6 -->
-      <a-col :xs="12" :sm="8" :xl="6">
-        <a-card
-          style="height: 240px; border: 1px dashed #d9d9d9; margin-bottom: 24px"
-          bodyStyle="padding: 0;display: flex;justify-content: center;align-items: center;height: 100%"
-        >
-          <a-button type="link" @click="handleStart">
-            <template #icon> <PlusOutlined /> </template>新增</a-button
+    <a-spin :spinning="loading">
+      <a-row :gutter="24">
+        <!-- <576px 12  >768px 8 >1200px 6 -->
+        <a-col :xs="12" :sm="8" :xl="6">
+          <a-card
+            style="height: 240px; border: 1px dashed #d9d9d9; margin-bottom: 24px"
+            :bodyStyle="{
+              padding: 0,
+              display: 'flex',
+              'justify-content': 'center',
+              'align-items': 'center',
+              height: '100%',
+            }"
           >
-        </a-card>
-      </a-col>
-      <a-col v-for="item in dataSource" :xs="12" :sm="8" :xl="6" :key="item.id">
-        <a-card
-          hoverable
-          style="height: 240px; margin-bottom: 24px"
-          bodyStyle="height: 126px;padding: 12px"
-        >
-          <template #actions>
-            <router-link :to="`/product/pet/${item.id}`">修改</router-link>
-            <a-popconfirm
-              title="确定要删除这条记录吗?"
-              :icon="null"
-              @confirm="handleDelete(item.id)"
+            <a-button type="link" @click="handleStart">
+              <template #icon> <PlusOutlined /> </template>新增</a-button
             >
-              <a type="link" @click="() => {}"> 删除</a>
-            </a-popconfirm>
-          </template>
-          <template #cover>
-            <div class="item-cover">
-              <img
-                v-for="(pic, index) in item.picture"
-                style="width: 64px; height: 64px"
-                :key="pic"
-                :src="pic"
-                @click="handlePreview(item, index)"
-              />
-            </div>
-          </template>
-          <a-card-meta :title="item.name || item.title">
-            <template #description>
-              <div class="item-description" v-html="item.description"></div>
+          </a-card>
+        </a-col>
+        <a-col v-for="item in dataSource" :xs="12" :sm="8" :xl="6" :key="item.id">
+          <a-card
+            hoverable
+            style="height: 240px; margin-bottom: 24px"
+            :bodyStyle="{ height: '126px', padding: '12px' }"
+          >
+            <template #actions>
+              <router-link :to="`/product/pet/${item.id}`">修改</router-link>
+              <a-popconfirm
+                title="确定要删除这条记录吗?"
+                :icon="null"
+                @confirm="handleDelete(item.id)"
+              >
+                <a type="link" @click="() => {}"> 删除</a>
+              </a-popconfirm>
             </template>
-          </a-card-meta>
-        </a-card>
-      </a-col>
-    </a-row>
-    <div class="generic-align-center">
-      <a-pagination
-        :total="total"
-        :current="formData.currentPage"
-        :page-size="formData.pageSize"
-        :page-size-options="['10', '20', '30', '40']"
-        show-size-changer
-        @change="
-          (page, pageSize) => {
-            formData.currentPage = page
-            formData.pageSize = pageSize
-            queryDataSource()
-          }
-        "
-      >
-      </a-pagination>
-    </div>
+            <template #cover>
+              <div class="item-cover">
+                <img
+                  v-for="(pic, index) in item.picture"
+                  style="width: 64px; height: 64px"
+                  :key="pic"
+                  :src="pic"
+                  @click="handlePreview(item, index)"
+                />
+              </div>
+            </template>
+            <a-card-meta :title="item.name || item.title">
+              <template #description>
+                <div class="item-description" v-html="item.description"></div>
+              </template>
+            </a-card-meta>
+          </a-card>
+        </a-col>
+      </a-row>
+      <div class="generic-align-center">
+        <a-pagination
+          :total="total"
+          :current="formData.currentPage"
+          :page-size="formData.pageSize"
+          :page-size-options="['10', '20', '30', '40']"
+          show-size-changer2
+          @change="
+            (page, pageSize) => {
+              formData.currentPage = page
+              formData.pageSize = pageSize
+              queryDataSource()
+            }
+          "
+        >
+        </a-pagination>
+      </div>
+    </a-spin>
 
     <preview-picture
       v-model:visible="previewVisible"
@@ -126,6 +150,7 @@ import { message, Modal } from 'ant-design-vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import PreviewPicture from '@/components/preview/Picture.vue'
 import { queryListApi, deleteOneApi, batchDeleteApi } from '@/api/product/pets'
+import { queryChildDictApi } from '@/api/product/dict'
 import useFormFields from '@/hooks/useFormFields'
 import { status } from './config'
 
@@ -138,23 +163,31 @@ const defaultFormData = {
   currentPage: 1,
   pageSize: 10,
   keyword: '',
-  status: undefined,
 }
 const formData = reactive({
   ...defaultFormData,
 })
 
-const { toggleCollapsed, showFields, span, layout, gutter, isWide } = useFormFields()
-
-const hanlderReset = () => {
-  Object.assign(formData, { ...defaultFormData })
-  queryDataSource()
-}
-
 const queryDataSource = async () => {
   try {
     loading.value = true
-    const res = await queryListApi(formData)
+    let types = []
+    classList.value.forEach((item) => {
+      if (item.checked) {
+        types.push(item.id)
+      }
+    })
+    let colors = []
+    colorList.value.forEach((item) => {
+      if (item.checked) {
+        colors.push(item.id)
+      }
+    })
+    const res = await queryListApi({
+      ...formData,
+      types: types.length > 0 ? types : undefined,
+      colors: colors.length > 0 ? colors : undefined,
+    })
     if (res.data) {
       dataSource.value = res.data.list || []
       total.value = res.data.total
@@ -193,8 +226,76 @@ const handleStart = () => {
   router.push('/product/pet/')
 }
 
+const colorList = ref([])
+const classList = ref([])
+const classAll = ref(true)
+const colorAll = ref(true)
+const queryDictData = async (parentId, callback) => {
+  try {
+    const res = await queryChildDictApi(parentId)
+    console.log('*********************', res)
+    callback(
+      res.data.map((item) => ({
+        ...item,
+        // checked: false,
+      })),
+    )
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const handleCheckedChange = (type, id, checked) => {
+  if (type === 'class' && checked) {
+    if (id === 0) {
+      classList.value = classList.value.map((item) => {
+        return {
+          ...item,
+          checked: false,
+        }
+      })
+    } else {
+      classAll.value = false
+    }
+  } else if (type === 'color' && checked) {
+    if (id === 0) {
+      colorList.value = colorList.value.map((item) => {
+        return {
+          ...item,
+          checked: false,
+        }
+      })
+    } else {
+      colorAll.value = false
+    }
+  } else if (type === 'class' && !checked) {
+    if (id !== 0) {
+      const hasChecked = classList.value.some((item) => item.checked)
+      if (!hasChecked) {
+        classAll.value = true
+      }
+    }
+  } else if (type === 'color' && !checked) {
+    if (id !== 0) {
+      const hasChecked = colorList.value.some((item) => item.checked)
+      if (!hasChecked) {
+        colorAll.value = true
+      }
+    }
+  }
+
+  formData.currentPage = 1
+  queryDataSource()
+}
+
 onMounted(() => {
   queryDataSource()
+  queryDictData(1, (data) => {
+    colorList.value = data
+  })
+  queryDictData(5, (data) => {
+    classList.value = data
+  })
 })
 
 const previewIndex = ref(0)
