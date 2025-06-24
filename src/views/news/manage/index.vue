@@ -50,13 +50,11 @@
         <a-col :span="12">
           <a-space>
             <a-button type="primary" @click="handleStart">新增</a-button>
-            <a-button
-              v-if="rowSelection.selectedRowKeys.length"
-              type="default"
-              danger
-              @click="handleBatchDelete"
-              >删除</a-button
-            >
+            <a-popconfirm title="确定要删除这些记录吗?" :icon="null" @confirm="handleBatchDelete">
+              <a-button v-if="rowSelection.selectedRowKeys.length" type="default" danger
+                >删除</a-button
+              >
+            </a-popconfirm>
           </a-space>
         </a-col>
         <a-col :span="12" class="generic-align-end">
@@ -87,7 +85,7 @@
         :row-selection="rowSelection"
         :loading="loading"
         :expand-column-width="60"
-        :scroll="{ x: 1400 }"
+        :scroll="{ x: 1600 }"
         rowKey="id"
         :sticky="{ offsetHeader: headerHeight }"
         @resizeColumn="resizeColumn"
@@ -101,6 +99,12 @@
         </template>
       </template> -->
         <template #bodyCell="{ column, record }">
+          <template v-if="column.key === 'title'">
+            <div :style="{ color: record.color || 'inherit' }">
+              <strong v-if="record.priority">[{{ record.priority }}]</strong>
+              <span>{{ record.title }}</span>
+            </div>
+          </template>
           <template v-if="column.key === 'picture'">
             <img
               v-if="record.picture"
@@ -109,8 +113,8 @@
             />
           </template>
           <template v-if="column.key === 'columnName'">
-            <span v-for="(item, index) in record.columnList"
-              >{{ index !== 0 ? ', ' : '' }}{{ item.name }}</span
+            <a-tag v-for="(item, index) in record.columnList"
+              >{{ index !== 0 ? '' : '' }}{{ item.name }}</a-tag
             >
           </template>
           <template v-if="column.key === 'status'">
@@ -119,7 +123,14 @@
           <template v-else-if="column.key === 'action'">
             <a-space :size="0">
               <a-button type="link" @click="handleEdit(record)">修改</a-button>
-              <a-button type="link" danger @click="deleteUser(record.id)">删除</a-button>
+              <a-popconfirm
+                placement="topRight"
+                title="确定要删除这条记录吗?"
+                :icon="null"
+                @confirm="handleDelete(record.id)"
+              >
+                <a-button type="link" danger>删除</a-button>
+              </a-popconfirm>
             </a-space>
           </template>
         </template>
@@ -133,24 +144,24 @@
         </template> -->
       </a-table>
     </a-card>
-
-    <edit-form v-model:visible="visible" :formData="editObject" @onSuccess="queryDataSource()">
-    </edit-form>
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref, reactive, watch, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
 import { SyncOutlined, SettingOutlined } from '@ant-design/icons-vue'
 
 import { queryListApi, deleteOneApi, batchDeleteApi } from '@/api/news/index'
 import { resizeColumn } from '@/utils/tools'
+import { formatDatetime } from '@/utils/format'
 import useFormFields from '@/hooks/useFormFields'
 import { status } from './config'
-import EditForm from './components/Edit.vue'
 import CustomColumn from '@/components/customColumn/index.vue'
 import { headerHeight } from '@/config/index'
+
+const router = useRouter()
 
 const dataSource = ref([])
 const loading = ref(false)
@@ -176,17 +187,10 @@ const rowSelection = reactive({
 
 const defaultColumns = [
   {
-    dataIndex: 'weight',
-    key: 'weight',
-    width: 80,
-    title: '权重',
-    fixed: 'left',
-  },
-  {
     dataIndex: 'title',
     key: 'title',
     resizable: true,
-    width: 240,
+    width: 200,
     title: '标题',
   },
   {
@@ -198,8 +202,6 @@ const defaultColumns = [
   {
     dataIndex: 'description',
     key: 'description',
-    resizable: true,
-    width: 240,
     title: '简介',
   },
   {
@@ -211,19 +213,19 @@ const defaultColumns = [
   {
     dataIndex: 'columnName',
     key: 'columnName',
-    minWidth: 150,
+    width: 150,
     title: '所属栏目',
   },
   {
     dataIndex: 'updater',
     key: 'updater',
-    minWidth: 150,
+    width: 150,
     title: '更新人',
   },
   {
     dataIndex: 'updated_at',
     key: 'updatedAt',
-    minWidth: 150,
+    width: 200,
     title: '更新时间',
   },
   {
@@ -254,7 +256,12 @@ const queryDataSource = async () => {
     loading.value = true
     const res = await queryListApi(formData)
     if (res.data) {
-      dataSource.value = res.data.list || []
+      dataSource.value = (res.data.list || []).map((item) => {
+        return {
+          ...item,
+          updated_at: formatDatetime(item.updated_at),
+        }
+      })
       total.value = res.data.total
     }
   } catch (error) {
@@ -264,83 +271,41 @@ const queryDataSource = async () => {
   }
 }
 
-const deleteUser = async (id) => {
-  Modal.confirm({
-    title: '提示',
-    // icon: createVNode(ExclamationCircleOutlined),
-    content: '确定要删除吗?',
-    okText: '确认',
-    cancelText: '取消',
-    onOk() {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await deleteOneApi(id)
-          message.success('删除成功')
-          resolve(true)
-          queryDataSource()
-        } catch (error) {
-          reject()
-          message.warning('删除失败')
-        }
-      }).catch(() => {})
-    },
-  })
+const handleDelete = async (id) => {
+  try {
+    await deleteOneApi(id)
+    message.success('删除成功')
+    queryDataSource()
+  } catch (error) {
+    message.warning('删除失败')
+  }
 }
 
 const handleBatchDelete = async (id) => {
-  Modal.confirm({
-    title: '提示',
-    // icon: createVNode(ExclamationCircleOutlined),
-    content: '确定要批量删除吗?',
-    okText: '确认',
-    cancelText: '取消',
-    onOk() {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await batchDeleteApi({ idList: rowSelection.selectedRowKeys })
-          message.success('删除成功')
-          resolve(true)
-          rowSelection.selectedRowKeys = []
-          queryDataSource()
-        } catch (error) {
-          reject()
-          message.warning('删除失败')
-        }
-      }).catch(() => {})
-    },
-  })
+  try {
+    await batchDeleteApi({ idList: rowSelection.selectedRowKeys })
+    message.success('删除成功')
+    resolve(true)
+    rowSelection.selectedRowKeys = []
+    queryDataSource()
+  } catch (error) {
+    reject()
+    message.warning('删除失败')
+  }
 }
 
 /********************** 新增修改 **********************/
-const defaultEditData = {
-  id: '',
-  title: '',
-  content: '',
-  color: '',
-  picture: '',
-  description: '',
-  priority: '',
-  status: '',
-  source: '',
-  columns: [],
-}
-const visible = ref(false)
-const editObject = ref({
-  ...defaultEditData,
-})
 
 const handleStart = () => {
-  editObject.value = {
-    ...defaultEditData,
-  }
-  visible.value = true
+  router.push({
+    path: '/news/single/',
+  })
 }
 
 const handleEdit = (record) => {
-  editObject.value = {
-    ...record,
-  }
-  visible.value = true
+  router.push({
+    path: '/news/single/' + record.id,
+  })
 }
 
 onMounted(() => {

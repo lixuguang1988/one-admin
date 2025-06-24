@@ -22,6 +22,16 @@ export default {
       component: () => import('@/views/news/manage/index.vue'),
     },
     {
+      path: '/news/single/:id?',
+      name: 'news-single',
+      meta: {
+        activeMenu: '/news/manage',
+        hideMenu: true,
+        title: '新闻管理',
+      },
+      component: () => import('@/views/news/manage/Single.vue'),
+    },
+    {
       path: '/news/column',
       name: 'column',
       meta: {

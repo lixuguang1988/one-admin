@@ -76,7 +76,7 @@
         <a-row>
           <a-col :span="24">
             <a-button style="margin-right: 8px" @click="handleCancel">取消</a-button>
-            <a-button type="primary" @click="handleOk">确定</a-button>
+            <a-button type="primary" :loading="loading" @click="handleOk">确定</a-button>
           </a-col>
         </a-row>
       </a-card>

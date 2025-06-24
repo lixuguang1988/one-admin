@@ -83,8 +83,15 @@
           </template>
           <template v-else-if="column.key === 'action'">
             <a-space>
-              <a-button type="primary" @click="handleEdit(record)">修改</a-button>
-              <a-button type="primary" danger @click="handleDelete(record.id)">删除</a-button>
+              <a-button type="link" @click="handleEdit(record)">修改</a-button>
+              <a-popconfirm
+                placement="topRight"
+                title="确定要删除这条记录吗?"
+                :icon="null"
+                @confirm="handleDelete(record.id)"
+              >
+                <a-button type="link" danger>删除</a-button>
+              </a-popconfirm>
             </a-space>
           </template>
         </template>
@@ -180,26 +187,13 @@ const queryDataSource = async () => {
 }
 
 const handleDelete = async (id) => {
-  Modal.confirm({
-    title: '提示',
-    // icon: createVNode(ExclamationCircleOutlined),
-    content: '确定要删除吗?',
-    okText: '确认',
-    cancelText: '取消',
-    onOk() {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await deletePermissionApi(id)
-          message.success('删除成功')
-          resolve(true)
-          queryDataSource()
-        } catch (error) {
-          reject()
-          message.warning('删除失败')
-        }
-      }).catch(() => {})
-    },
-  })
+  try {
+    await deletePermissionApi(id)
+    message.success('删除成功')
+    queryDataSource()
+  } catch (error) {
+    message.warning('删除失败')
+  }
 }
 
 /********************** 新增修改 **********************/

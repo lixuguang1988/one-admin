@@ -27,14 +27,14 @@
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'action'">
             <a-space>
-              <a-button type="primary" @click="handleEdit(record)">修改</a-button>
+              <a-button type="link" @click="handleEdit(record)">修改</a-button>
               <a-popconfirm
                 placement="topRight"
                 title="确定要删除这条记录吗?"
                 :icon="null"
                 @confirm="handleDelete(record.id)"
               >
-                <a-button type="primary" danger @click="">删除</a-button>
+                <a-button type="link" danger @click="">删除</a-button>
               </a-popconfirm>
             </a-space>
           </template>

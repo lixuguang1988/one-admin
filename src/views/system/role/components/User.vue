@@ -14,13 +14,11 @@
           <a-col :span="12">
             <a-space>
               <a-button type="primary" @click="handleStart">新增</a-button>
-              <a-button
-                v-if="rowSelection.selectedRowKeys.length"
-                type="default"
-                danger
-                @click="handleBatchDelete"
-                >删除</a-button
-              >
+              <a-popconfirm title="确定要删除这些记录吗?" :icon="null" @confirm="handleBatchDelete">
+                <a-button v-if="rowSelection.selectedRowKeys.length" type="default" danger
+                  >删除</a-button
+                >
+              </a-popconfirm>
             </a-space>
           </a-col>
         </a-row>
@@ -48,7 +46,14 @@
           <template #bodyCell="{ column, record, text }">
             <template v-if="column.key === 'action'">
               <a-space v-if="!editableData[record.id]">
-                <a-button type="text" danger @click="deleteUser(record.id)">删除</a-button>
+                <a-popconfirm
+                  placement="topRight"
+                  title="确定要删除这条记录吗?"
+                  :icon="null"
+                  @confirm="handleDelete(record.id)"
+                >
+                  <a-button type="text" danger>删除</a-button>
+                </a-popconfirm>
               </a-space>
             </template>
             <template v-else-if="column.key === 'username'">
@@ -196,51 +201,27 @@ const queryDataSource = async () => {
   }
 }
 
-const deleteUser = async (id) => {
-  Modal.confirm({
-    title: '提示',
-    // icon: createVNode(ExclamationCircleOutlined),
-    content: '确定要删除吗?',
-    okText: '确认',
-    cancelText: '取消',
-    onOk() {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await deleteRoleOneApi({ userId: id, roleId: props.formData.id })
-          message.success('删除成功')
-          resolve(true)
-          queryDataSource()
-        } catch (error) {
-          reject()
-          message.warning('删除失败')
-        }
-      }).catch(() => {})
-    },
-  })
+const handleDelete = async (id) => {
+  try {
+    await deleteRoleOneApi({ userId: id, roleId: props.formData.id })
+    message.success('删除成功')
+    resolve(true)
+    queryDataSource()
+  } catch (error) {
+    reject()
+    message.warning('删除失败')
+  }
 }
 
 const handleBatchDelete = async (id) => {
-  Modal.confirm({
-    title: '提示',
-    // icon: createVNode(ExclamationCircleOutlined),
-    content: '确定要批量删除吗?',
-    okText: '确认',
-    cancelText: '取消',
-    onOk() {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await batchDeleteUserApi({ idList: rowSelection.selectedRowKeys })
-          message.success('删除成功')
-          resolve(true)
-          rowSelection.selectedRowKeys = []
-          queryDataSource()
-        } catch (error) {
-          reject()
-          message.warning('删除失败')
-        }
-      }).catch(() => {})
-    },
-  })
+  try {
+    await batchDeleteUserApi({ idList: rowSelection.selectedRowKeys })
+    message.success('删除成功')
+    rowSelection.selectedRowKeys = []
+    queryDataSource()
+  } catch (error) {
+    message.warning('删除失败')
+  }
 }
 
 const modelVisible = ref(props.visible)
@@ -250,6 +231,7 @@ watch(
     modelVisible.value = newVal
     if (newVal) {
       queryDataSource()
+      rowSelection.selectedRowKeys = []
     }
   },
 )

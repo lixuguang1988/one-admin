@@ -24,6 +24,12 @@ export const queryListApi = (params) => {
   })
 }
 
+export const queryOneApi = (id) => {
+  return request({
+    url: `/news/${id}`,
+    method: 'get',
+  })
+}
 export const deleteOneApi = (id) => {
   return request({
     url: `/news/${id}`,
